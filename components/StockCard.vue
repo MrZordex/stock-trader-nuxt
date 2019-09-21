@@ -1,7 +1,7 @@
     <template>
-  <div class="stock-card container">
+  <div class="stock-card container" :style="{'animation-delay':animationDelay +'s'}">
     <div class="header">
-      <span class="name" alt="asdasd">{{stock.name}}</span>
+      <span class="name">{{stock.name}}</span>
       <div class="details">
         <div>Bought: {{boughtStocksCount}}</div>
         <div>Price: ${{stock.price}}</div>
@@ -64,6 +64,11 @@ export default {
     stock: {
       type: Object,
       required: true
+    },
+    animationDelay: {
+      type: Number,
+      required: false,
+      default: 0
     }
   },
   methods: {
@@ -94,8 +99,9 @@ export default {
   display: inline-block;
   padding: 0;
   margin: 1em 0.3em;
-  transform: translateX(100vw);
-  animation: goleft 0.5s linear forwards;
+  opacity: 0;
+  //transform: translateX(100vw);
+  animation: fadein 0.4s linear forwards;
   width: 400px;
 }
 .header {
@@ -145,6 +151,12 @@ export default {
   .green-button {
     border: 0;
     border-left: $border;
+  }
+}
+
+@keyframes fadein {
+  100% {
+    opacity: 1;
   }
 }
 

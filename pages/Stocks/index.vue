@@ -1,6 +1,12 @@
 <template>
   <div class="stocks">
-    <stock-card v-for="stock in stocks" :stock="stock" :key="stock.symbol" :isPortfolio="false"></stock-card>
+    <stock-card
+      v-for="(stock,i) in stocks"
+      :stock="stock"
+      :key="stock.symbol"
+      :isPortfolio="false"
+      :animationDelay="i*0.015"
+    ></stock-card>
   </div>
 </template>
 
