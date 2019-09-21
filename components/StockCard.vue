@@ -103,6 +103,12 @@ export default {
   //transform: translateX(100vw);
   animation: fadein 0.4s linear forwards;
   width: 400px;
+
+  &:hover {
+    .name {
+      white-space: initial;
+    }
+  }
 }
 .header {
   display: flex;
@@ -122,6 +128,7 @@ export default {
 
   .details {
     font-size: 0.5em;
+    align-self: flex-start;
   }
 }
 .content {
