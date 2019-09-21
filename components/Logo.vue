@@ -1,11 +1,19 @@
 <template>
-  <div class="VueToNuxtLogo">
+  <div class="VueToNuxtLogo" :style="{'zoom': size/245}">
     <div class="Triangle Triangle--two" />
     <div class="Triangle Triangle--one" />
     <div class="Triangle Triangle--three" />
     <div class="Triangle Triangle--four" />
   </div>
 </template>
+
+<script>
+export default {
+  props: {
+    size: Number
+  }
+};
+</script>
 
 <style>
 .VueToNuxtLogo {

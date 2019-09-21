@@ -23,11 +23,15 @@ export default {
   ** Global CSS
   */
   css: [
+    "~assets/styles/main.scss",
+    "~assets/styles/framework.scss"
   ],
   /*
   ** Plugins to load before mounting the App
   */
   plugins: [
+    "@plugins/filters.js",
+    "@plugins/common-components.js"
   ],
   /*
   ** Nuxt.js dev-modules
@@ -54,7 +58,14 @@ export default {
     /*
     ** You can extend webpack config here
     */
-    extend (config, ctx) {
+    extend(config, ctx) {
     }
+  },
+  env: {
+    stockBaseUrl: "https://api.iextrading.com/1.0"
+  },
+  transition: {
+    name: "fade",
+    mode: "out-in"
   }
 }
