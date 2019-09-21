@@ -1,9 +1,6 @@
 <template>
-  <div class="stocks container">
-    <h1>This is a stocks page</h1>
-    <div class="stocks">
-      <stock-card v-for="(stock,i) in stocks" :stock="stock" :key="i"></stock-card>
-    </div>
+  <div class="stocks">
+    <stock-card v-for="stock in stocks" :stock="stock" :key="stock.symbol" :isPortfolio="false"></stock-card>
   </div>
 </template>
 
@@ -22,5 +19,6 @@ export default {
 .stocks {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
 }
 </style>

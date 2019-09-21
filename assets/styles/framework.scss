@@ -22,4 +22,26 @@
     &:hover {
         background-color: $dark-green;
     }
+
+    &.disabled {
+        background-color: $green;
+        cursor: not-allowed;
+    }
+}
+
+.blue-button {
+    display: inline-block;
+    border: $border;
+    padding: 0.5em 1em;
+    cursor: pointer;
+    background-color: $blue;
+
+    &:hover {
+        background-color: $dark-blue;
+    }
+
+    &.disabled {
+        background-color: $blue;
+        cursor: not-allowed;
+    }
 }
