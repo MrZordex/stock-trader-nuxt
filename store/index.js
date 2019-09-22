@@ -45,6 +45,8 @@ const getStocks = async (context, options) => {
 };
 
 const GetCookies = (context) => {
+    if (!context.req)
+        return new Object();
     const rawCookie = context.req.headers.cookie;
     if (!rawCookie)
         return new Object();
