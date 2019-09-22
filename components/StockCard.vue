@@ -31,8 +31,7 @@
 export default {
   data() {
     return {
-      quantity: null,
-      stock: this.stock
+      quantity: null
     };
   },
   computed: {
@@ -85,6 +84,7 @@ export default {
         ...this.stock,
         quantity: this.quantity
       });
+      this.quantity = null;
     },
     sellStocks() {
       if (!this.canSell) return;
