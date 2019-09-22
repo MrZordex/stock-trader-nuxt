@@ -1,7 +1,8 @@
 import Vuex from "vuex";
 import seedrandom from "seedrandom";
 
-const getStocks = async (context, amount, minValue) => {
+const getStocks = async (context, options) => {
+    let { amount, minPrice, maxPrice } = options;
     let random = seedrandom("random_stocks_4");
 
     let symbols = await context.app.$axios
@@ -26,11 +27,12 @@ const getStocks = async (context, amount, minValue) => {
     for (let i = 0; i < tops.length && stocks.length < amount; i++) {
         let symbol = symbols.find(s => s.symbol == tops[i].symbol);
 
-        if (symbol && symbol.name && tops[i].price >= minValue) {
+        if (symbol && symbol.name && tops[i].price >= minPrice && tops[i].price < maxPrice) {
             stocks.push({
                 symbol: symbol.symbol,
                 name: symbol.name,
-                price: tops[i].price
+                price: tops[i].price,
+                deviation: 0
             });
         }
     }
@@ -72,12 +74,42 @@ export default () => new Vuex.Store({
         },
         updateBoughtStocks(state, stocks) {
             state.boughtStocks = [...stocks];
+        },
+        setMarketDeviation(state, options) {
+            let random = seedrandom(+new Date());
+            state.allStocks.forEach(stock => {
+                stock.deviation = stock.deviation || 0;
+                let devDelta = random() * options.delta * 2 - options.delta;
+                stock.deviation += devDelta;
+                if (stock.deviation > options.threshold) stock.deviation = options.threshold;
+                if (stock.deviation < -options.threshold) stock.deviation = -options.threshold;
+            });
+        },
+        setBoughtDeviation(state) {
+            for (let i = 0; i < state.boughtStocks.length; i++) {
+                let stock = state.boughtStocks[i];
+                stock.deviation = state.allStocks.find(s => s.symbol == stock.symbol).deviation;
+            }
         }
     },
     actions: {
         async nuxtServerInit(vuexContext, context) {
-            let stocks = await getStocks(context, 24, 90);
-            vuexContext.commit("loadStocks", stocks);
+            let lowStocks = await getStocks(context, {
+                amount: 8,
+                minPrice: 80,
+                maxPrice: 300
+            });
+            let midStocks = await getStocks(context, {
+                amount: 8,
+                minPrice: 300,
+                maxPrice: 1200
+            });
+            let highStocks = await getStocks(context, {
+                amount: 8,
+                minPrice: 1200,
+                maxPrice: Infinity
+            });
+            vuexContext.commit("loadStocks", [...lowStocks, ...midStocks, ...highStocks]);
         },
         buyStocks(vuexContext, stocks) {
             if (vuexContext.state.funds - stocks.quantity * stocks.price < 0)
@@ -103,7 +135,8 @@ export default () => new Vuex.Store({
         },
         endDay(vuexContext) {
             vuexContext.state.day++;
-            console.log(vuexContext.state.funds + " end day");
+            vuexContext.commit("setMarketDeviation", { delta: 10, threshold: 60 });
+            vuexContext.commit("setBoughtDeviation");
         }
     },
 });

@@ -4,7 +4,7 @@
       <span class="name">{{stock.name}}</span>
       <div class="details">
         <div>Bought: {{boughtStocksCount}}</div>
-        <div>Price: ${{stock.price}}</div>
+        <div>Price: ${{stockDeviationPrice | money}}</div>
       </div>
     </div>
     <div class="content">
@@ -31,10 +31,16 @@
 export default {
   data() {
     return {
-      quantity: null
+      quantity: null,
+      stock: this.stock
     };
   },
   computed: {
+    stockDeviationPrice() {
+      return Math.round(
+        (1 + (this.stock.deviation || 0) / 100) * this.stock.price
+      );
+    },
     quantityInput: {
       get() {
         return this.quantity || null;
@@ -49,7 +55,7 @@ export default {
     canBuy() {
       return (
         this.quantity &&
-        this.quantity * this.stock.price < this.$store.getters.funds
+        this.quantity * this.stockDeviationPrice < this.$store.getters.funds
       );
     },
     canSell() {
