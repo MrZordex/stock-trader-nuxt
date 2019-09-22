@@ -1,5 +1,6 @@
 import Vuex from "vuex";
 import seedrandom from "seedrandom";
+import Cookie from "js-cookie";
 
 const getStocks = async (context, options) => {
     let { amount, minPrice, maxPrice } = options;
@@ -40,6 +41,16 @@ const getStocks = async (context, options) => {
     return stocks;
 };
 
+const GetCookies = (context) => {
+    const rawCookie = context.req.headers.cookie;
+    const cookiePairs = rawCookie.split(';').map(s => s.trim().split('='));
+    let cookies = new Object();
+    cookiePairs.forEach(cp => {
+        cookies[cp[0]] = JSON.parse(unescape(cp[1]));
+    })
+    return cookies;
+};
+
 export default () => new Vuex.Store({
     state: {
         funds: 10000,
@@ -58,6 +69,12 @@ export default () => new Vuex.Store({
         }
     },
     mutations: {
+        loadState(state, newState) {
+            Object.assign(state, newState);
+        },
+        saveState(state) {
+            Cookie.set("state", JSON.stringify(state));
+        },
         loadStocks(state, stocks) {
             state.allStocks = [...stocks];
         },
@@ -94,6 +111,13 @@ export default () => new Vuex.Store({
     },
     actions: {
         async nuxtServerInit(vuexContext, context) {
+            const cookies = GetCookies(context);
+
+            if (cookies.state) {
+                vuexContext.commit("loadState", cookies.state);
+                return;
+            }
+
             let lowStocks = await getStocks(context, {
                 amount: 8,
                 minPrice: 80,
@@ -137,6 +161,7 @@ export default () => new Vuex.Store({
             vuexContext.state.day++;
             vuexContext.commit("setMarketDeviation", { delta: 10, threshold: 60 });
             vuexContext.commit("setBoughtDeviation");
+            vuexContext.commit("saveState");
         }
     },
 });
