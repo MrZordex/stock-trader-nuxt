@@ -1,6 +1,9 @@
 import Vuex from "vuex";
 import seedrandom from "seedrandom";
 import Cookie from "js-cookie";
+import SimpleCrypto from "simple-crypto-js";
+
+const simpleCrypto = new SimpleCrypto("no_free_stocks!");
 
 const getStocks = async (context, options) => {
     let { amount, minPrice, maxPrice } = options;
@@ -43,10 +46,13 @@ const getStocks = async (context, options) => {
 
 const GetCookies = (context) => {
     const rawCookie = context.req.headers.cookie;
+    if (!rawCookie)
+        return new Object();
+
     const cookiePairs = rawCookie.split(';').map(s => s.trim().split('='));
     let cookies = new Object();
     cookiePairs.forEach(cp => {
-        cookies[cp[0]] = JSON.parse(unescape(cp[1]));
+        cookies[cp[0]] = unescape(cp[1]);
     })
     return cookies;
 };
@@ -73,7 +79,7 @@ export default () => new Vuex.Store({
             Object.assign(state, newState);
         },
         saveState(state) {
-            Cookie.set("state", JSON.stringify(state));
+            Cookie.set("state", simpleCrypto.encrypt(state));
         },
         loadStocks(state, stocks) {
             state.allStocks = [...stocks];
@@ -114,7 +120,7 @@ export default () => new Vuex.Store({
             const cookies = GetCookies(context);
 
             if (cookies.state) {
-                vuexContext.commit("loadState", cookies.state);
+                vuexContext.commit("loadState", JSON.parse(simpleCrypto.decrypt(cookies.state)));
                 return;
             }
 
